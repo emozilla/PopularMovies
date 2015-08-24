@@ -1,46 +1,41 @@
 package net.nanodegree.popularmovies.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.omertron.themoviedbapi.MovieDbException;
-import com.omertron.themoviedbapi.TheMovieDbApi;
-import com.omertron.themoviedbapi.model.movie.MovieBasic;
-import com.omertron.themoviedbapi.results.ResultList;
-
+import net.nanodegree.popularmovies.MovieActivity;
 import net.nanodegree.popularmovies.R;
 import net.nanodegree.popularmovies.adapters.GridPostersAdapter;
 import net.nanodegree.popularmovies.listeners.FragmentInteractionListener;
 import net.nanodegree.popularmovies.listeners.MovieResultsListener;
+import net.nanodegree.popularmovies.model.Movie;
 import net.nanodegree.popularmovies.tasks.MovieDbRequest;
-
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.util.ArrayList;
 
 public class PostersFragment extends Fragment implements MovieResultsListener {
 
     private ProgressDialog progress;
-    private TheMovieDbApi instance;
     private FragmentInteractionListener interactionListener;
     private boolean sortDescending = true;
     private String criteria = "popularity";
-    private ResultList<MovieBasic> movies;
 
     public PostersFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState==null) {
@@ -52,26 +47,34 @@ public class PostersFragment extends Fragment implements MovieResultsListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
         return inflater.inflate(R.layout.fragment_movie_posters, container, false);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_movies, menu);
+
+        inflater.inflate(R.menu.menu_posters, menu);
     }
 
     @Override
-    public void onMoviesLoaded(ResultList<MovieBasic> movies) {
+    public void onMoviesLoaded(ArrayList<Movie> movies) {
 
         if (progress != null)
             progress.dismiss();
 
         if (movies != null) {
-            this.movies = movies;
             GridView posters = (GridView) getActivity().findViewById(R.id.posters);
-            GridPostersAdapter adapter = new GridPostersAdapter(getActivity(), R.layout.grid_item_layout, new ArrayList(movies.getResults()));
+            GridPostersAdapter adapter = new GridPostersAdapter(getActivity(),
+                    R.layout.grid_item_layout, movies);
             posters.setAdapter(adapter);
+
+            posters.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getActivity(), MovieActivity.class);
+                    startActivity(intent);
+                }
+            });
         }
     }
 
@@ -113,18 +116,7 @@ public class PostersFragment extends Fragment implements MovieResultsListener {
         this.interactionListener = interactionListener;
     }
 
-    private void setApiInstance() {
-        try {
-            instance = new TheMovieDbApi("21a32bdbe87dae42d59a35ccf8c4cc9d", new DefaultHttpClient());
-        } catch (MovieDbException e) {
-            Log.e("POPULAR_MOVIES", e.getMessage());
-        }
-    }
-
     public void doMovieSearch() {
-
-        if (instance == null)
-            setApiInstance();
 
         progress = ProgressDialog.show(getActivity(), getString(R.string.progress_title), getString(R.string.progress_text), true);
 
@@ -133,7 +125,7 @@ public class PostersFragment extends Fragment implements MovieResultsListener {
         arguments.add(Boolean.toString(sortDescending));
 
         try {
-            new MovieDbRequest(this, instance).execute(arguments);
+            new MovieDbRequest(this).execute(arguments);
         }
         catch (Exception e) {
             interactionListener.showNoConnectivity();

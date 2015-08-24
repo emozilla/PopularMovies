@@ -2,23 +2,15 @@ package net.nanodegree.popularmovies.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-
-import com.omertron.themoviedbapi.model.movie.MovieBasic;
-import com.omertron.themoviedbapi.model.config.Configuration;
-
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
 import net.nanodegree.popularmovies.R;
+import net.nanodegree.popularmovies.model.Movie;
 
-import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -55,10 +47,13 @@ public class GridPostersAdapter extends ArrayAdapter {
             holder = (MovieHolder) convertView.getTag();
         }
 
-        MovieBasic movie = (MovieBasic) data.get(position);
+        Picasso.with(this.context).load("http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg")
+                .fit().error(R.drawable.ic_error_fallback).into(holder.moviePoster);
+
+        Movie movie = (Movie) data.get(position);
 
         if (movie != null)
-            Picasso.with(this.context).load(BASE_URL + "w185" + movie.getPosterPath())
+            Picasso.with(this.context).load(BASE_URL + "w185" + movie.poster)
                     .fit().error(R.drawable.ic_error_fallback).into(holder.moviePoster);
 
         return convertView;
@@ -67,6 +62,5 @@ public class GridPostersAdapter extends ArrayAdapter {
     static class MovieHolder
     {
         ImageView moviePoster;
-        ProgressBar progress;
     }
 }

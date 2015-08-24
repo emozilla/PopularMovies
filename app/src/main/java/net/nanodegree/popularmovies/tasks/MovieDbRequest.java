@@ -1,75 +1,68 @@
 package net.nanodegree.popularmovies.tasks;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.omertron.themoviedbapi.MovieDbException;
-import com.omertron.themoviedbapi.TheMovieDbApi;
-import com.omertron.themoviedbapi.enumeration.SortBy;
-import com.omertron.themoviedbapi.model.discover.Discover;
-import com.omertron.themoviedbapi.model.movie.MovieBasic;
-import com.omertron.themoviedbapi.results.ResultList;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.nanodegree.popularmovies.listeners.MovieResultsListener;
+import net.nanodegree.popularmovies.model.Movie;
+import net.nanodegree.popularmovies.model.MovieDbResult;
 
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.impl.client.DefaultHttpClient;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Created by antonio on 13/07/15.
  */
-public class MovieDbRequest extends AsyncTask<ArrayList<String>, Void, ResultList<MovieBasic>> {
+public class MovieDbRequest extends AsyncTask<ArrayList<String>, Void, ArrayList<Movie>> {
 
     private MovieResultsListener callback;
-    private TheMovieDbApi instance;
 
-    public MovieDbRequest(MovieResultsListener callback, TheMovieDbApi instance) {
-        this.instance = instance;
+    public MovieDbRequest(MovieResultsListener callback) {
         this.callback = callback;
     }
 
     @Override
-    protected ResultList<MovieBasic> doInBackground(ArrayList<String>... args) {
+    protected ArrayList<Movie> doInBackground(ArrayList<String>... args) {
 
-        ResultList<MovieBasic> list = null;
-        Discover params = new Discover();
-        params.year(Calendar.getInstance().get(Calendar.YEAR));
-        ArrayList arguments = args[0];
-
-        if (arguments.get(0).equals("popularity")) {
-
-            if (arguments.get(1).equals("true"))
-                params.sortBy(SortBy.POPULARITY_DESC);
-            else
-                params.sortBy(SortBy.POPULARITY_ASC);
-        }
-        else if (arguments.get(0).equals("rating")) {
-
-            if (arguments.get(1).equals("true"))
-                params.sortBy(SortBy.VOTE_AVERAGE_DESC);
-            else
-                params.sortBy(SortBy.VOTE_AVERAGE_ASC);
-        }
+        ArrayList<Movie> list = null;
+        HttpURLConnection connection = null;
 
         try {
-             list = instance.getDiscoverMovies(params);
-        } catch (Exception e) {
-            list = null;
+            URL url = new URL("http://api.themoviedb.org/3/discover/movie?primary_release_year=2015sort_by=popularity.asc&api_key=21a32bdbe87dae42d59a35ccf8c4cc9d");
+
+            connection = (HttpURLConnection) url.openConnection();
+
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                ObjectMapper mapper = new ObjectMapper();
+                MovieDbResult result = mapper.readValue(br, MovieDbResult.class);
+                list = result.results;
+            }
+
+        } catch (MalformedURLException e) {
+            // ...
+        } catch (IOException e) {
+            // ...
+        }
+        finally {
+            connection.disconnect();
         }
 
         return list;
     }
 
     @Override
-    protected void onPostExecute(ResultList<MovieBasic> movies) {
+    protected void onPostExecute(ArrayList<Movie> movies) {
         try {
             if (callback != null)
                 callback.onMoviesLoaded(movies);
         }catch (Exception e) {
-            Log.e("POPULAR_MOVIES", "Error en onPostExecute");
             e.printStackTrace();
         }
     }

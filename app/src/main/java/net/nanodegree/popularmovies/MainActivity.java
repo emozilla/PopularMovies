@@ -2,9 +2,6 @@ package net.nanodegree.popularmovies;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-
-import com.omertron.themoviedbapi.model.movie.MovieBasic;
-
 import net.nanodegree.popularmovies.fragments.PostersFragment;
 import net.nanodegree.popularmovies.fragments.NoConnectivityFragment;
 import net.nanodegree.popularmovies.listeners.FragmentInteractionListener;
@@ -43,11 +40,6 @@ public class MainActivity extends ActionBarActivity implements FragmentInteracti
     }
 
     @Override
-    public void showMovie(MovieBasic movie) {
-
-    }
-
-    @Override
     public void showPosters(boolean reload) {
 
         getSupportFragmentManager()
@@ -58,5 +50,4 @@ public class MainActivity extends ActionBarActivity implements FragmentInteracti
         if (reload)
             posters.doMovieSearch();
     }
-
 }

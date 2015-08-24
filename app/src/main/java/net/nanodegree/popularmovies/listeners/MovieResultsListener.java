@@ -1,11 +1,11 @@
 package net.nanodegree.popularmovies.listeners;
 
-import com.omertron.themoviedbapi.model.movie.MovieBasic;
-import com.omertron.themoviedbapi.results.ResultList;
+import net.nanodegree.popularmovies.model.Movie;
+import java.util.ArrayList;
 
 /**
  * Created by antonio on 13/07/15.
  */
 public interface MovieResultsListener {
-    public void onMoviesLoaded(ResultList<MovieBasic> movies);
+    public void onMoviesLoaded(ArrayList<Movie> movies);
 }
