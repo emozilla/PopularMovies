@@ -2,38 +2,61 @@ package net.nanodegree.popularmovies;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
+import com.omertron.themoviedbapi.model.movie.MovieBasic;
 
-public class MainActivity extends ActionBarActivity {
+import net.nanodegree.popularmovies.fragments.PostersFragment;
+import net.nanodegree.popularmovies.fragments.NoConnectivityFragment;
+import net.nanodegree.popularmovies.listeners.FragmentInteractionListener;
+
+public class MainActivity extends ActionBarActivity implements FragmentInteractionListener {
+
+    private PostersFragment posters;
+    private NoConnectivityFragment ncFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
 
+        posters = new PostersFragment();
+        posters.setInteractionListener(this);
+
+        ncFragment = new NoConnectivityFragment();
+        ncFragment.setInteractionListener(this);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment_container, posters, "POSTERS")
+                .commit();
+    }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    public void showNoConnectivity() {
+
+        if (getSupportFragmentManager().findFragmentByTag("CONNECTIVITY") == null)
+            getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment_container, ncFragment, "CONNECTIVITY")
+                .commit();
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    public void showMovie(MovieBasic movie) {
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void showPosters(boolean reload) {
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .remove(ncFragment)
+                .commit();
+
+        if (reload)
+            posters.doMovieSearch();
+    }
+
 }
