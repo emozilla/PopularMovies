@@ -46,9 +46,9 @@ public class MovieDbRequest extends AsyncTask<ArrayList<String>, Void, ArrayList
             }
 
         } catch (MalformedURLException e) {
-            // ...
+            e.printStackTrace();
         } catch (IOException e) {
-            // ...
+            e.printStackTrace();
         }
         finally {
             connection.disconnect();

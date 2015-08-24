@@ -20,6 +20,7 @@ import net.nanodegree.popularmovies.adapters.GridPostersAdapter;
 import net.nanodegree.popularmovies.listeners.FragmentInteractionListener;
 import net.nanodegree.popularmovies.listeners.MovieResultsListener;
 import net.nanodegree.popularmovies.model.Movie;
+import net.nanodegree.popularmovies.model.ParcelableMovie;
 import net.nanodegree.popularmovies.tasks.MovieDbRequest;
 
 import java.util.ArrayList;
@@ -68,10 +69,12 @@ public class PostersFragment extends Fragment implements MovieResultsListener {
                     R.layout.grid_item_layout, movies);
             posters.setAdapter(adapter);
 
+            final ArrayList<Movie> movieList = movies;
             posters.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent intent = new Intent(getActivity(), MovieActivity.class);
+                    intent.putExtra("movie", new ParcelableMovie(movieList.get(position)));
                     startActivity(intent);
                 }
             });

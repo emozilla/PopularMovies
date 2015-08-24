@@ -18,7 +18,7 @@ import java.util.ArrayList;
  */
 public class GridPostersAdapter extends ArrayAdapter {
 
-    private final String BASE_URL = "http://image.tmdb.org/t/p/";
+    private final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
 
     private Context context;
     private int layout;
@@ -47,13 +47,10 @@ public class GridPostersAdapter extends ArrayAdapter {
             holder = (MovieHolder) convertView.getTag();
         }
 
-        Picasso.with(this.context).load("http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg")
-                .fit().error(R.drawable.ic_error_fallback).into(holder.moviePoster);
-
         Movie movie = (Movie) data.get(position);
 
         if (movie != null)
-            Picasso.with(this.context).load(BASE_URL + "w185" + movie.poster)
+            Picasso.with(this.context).load(IMAGE_BASE_URL + "w185" + movie.poster)
                     .fit().error(R.drawable.ic_error_fallback).into(holder.moviePoster);
 
         return convertView;
