@@ -2,20 +2,14 @@
     <string name="app_name">Popular Movies</string>
     <string name="text_sort_popularity">Most popular</string>
     <string name="text_sort_rating">Highest rated</string>
-
     <string name="text_sort_order">Sort order</string>
-
     <string name="progress_title">Loading</string>
     <string name="progress_text">Loading Movies...</string>
-
     <string name="no_connectivity_msg">No internet connection!</string>
     <string name="no_connectivity_msg2">Tap to retry</string>
-
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_movie">MovieActivity</string>
+    <string name="user_rating_text">User rating:</string>
+    <string name="release_date_text">Release date:</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
 
 </resources>

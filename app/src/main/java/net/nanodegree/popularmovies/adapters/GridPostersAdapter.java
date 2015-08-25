@@ -51,7 +51,7 @@ public class GridPostersAdapter extends ArrayAdapter {
 
         if (movie != null)
             Picasso.with(this.context).load(IMAGE_BASE_URL + "w185" + movie.poster)
-                    .fit().error(R.drawable.ic_error_fallback).into(holder.moviePoster);
+                    .error(R.drawable.ic_poster_fallback).fit().into(holder.moviePoster);
 
         return convertView;
     }

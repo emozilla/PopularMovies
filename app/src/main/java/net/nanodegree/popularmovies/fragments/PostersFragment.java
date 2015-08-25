@@ -1,6 +1,8 @@
 package net.nanodegree.popularmovies.fragments;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -23,14 +25,22 @@ import net.nanodegree.popularmovies.model.Movie;
 import net.nanodegree.popularmovies.model.ParcelableMovie;
 import net.nanodegree.popularmovies.tasks.MovieDbRequest;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class PostersFragment extends Fragment implements MovieResultsListener {
 
     private ProgressDialog progress;
     private FragmentInteractionListener interactionListener;
-    private boolean sortDescending = true;
-    private String criteria = "popularity";
+
+    private final String BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
+    private String apiKey = null;
+    private String currentCriteria = "popularity.desc";
 
     public PostersFragment() {}
 
@@ -82,26 +92,20 @@ public class PostersFragment extends Fragment implements MovieResultsListener {
     }
 
     @Override
+    public void onMoviesLoadError() {
+        interactionListener.showNoConnectivity();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
 
-        if (id == R.id.sort_order) {
-
-            if (sortDescending) {
-                sortDescending = false;
-                item.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_arrow_drop_up_white_36dp));
-            }
-            else {
-                sortDescending = true;
-                item.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_arrow_drop_down_white_36dp));
-            }
-        }
-        else if (id == R.id.sort_popular) {
-            criteria = "popularity";
+        if (id == R.id.sort_popular) {
+            currentCriteria = "popularity.desc";
         }
         else if (id == R.id.sort_rating) {
-            criteria = "rating";
+            currentCriteria = "vote_average.desc";
         }
 
         doMovieSearch();
@@ -114,21 +118,59 @@ public class PostersFragment extends Fragment implements MovieResultsListener {
         super.onSaveInstanceState(outState);
     }
 
-
     public void setInteractionListener(FragmentInteractionListener interactionListener) {
         this.interactionListener = interactionListener;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        doMovieSearch();
+    }
+
+    public String buildQueryURL(){
+
+        if (apiKey == null)
+            apiKey = getKeyFromResource(getActivity());
+
+        String url = BASE_URL +
+                "primary_release_year="  + Integer.toString(Calendar.getInstance().get(Calendar.YEAR)) + "&" +
+                "language=en" + "&" +
+                "sort_by=" + currentCriteria + "&" +
+                "api_key=" + apiKey;
+
+        return  url;
+    }
+
+    private static String getKeyFromResource(Context context) {
+
+        String strKey = "";
+
+        try {
+            InputStream in = context.getResources().openRawResource(R.raw.themoviedbkey);
+            BufferedReader r = new BufferedReader(new InputStreamReader(in));
+            StringBuilder total = new StringBuilder();
+
+            while ((strKey = r.readLine()) != null) {
+                total.append(strKey);
+            }
+
+            strKey = total.toString();
+            strKey = strKey.trim();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return strKey;
     }
 
     public void doMovieSearch() {
 
         progress = ProgressDialog.show(getActivity(), getString(R.string.progress_title), getString(R.string.progress_text), true);
 
-        ArrayList<String> arguments = new ArrayList<String>();
-        arguments.add(criteria);
-        arguments.add(Boolean.toString(sortDescending));
-
         try {
-            new MovieDbRequest(this).execute(arguments);
+            new MovieDbRequest(this).execute(buildQueryURL());
         }
         catch (Exception e) {
             interactionListener.showNoConnectivity();

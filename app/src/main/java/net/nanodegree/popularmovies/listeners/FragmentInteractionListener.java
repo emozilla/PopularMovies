@@ -5,5 +5,5 @@ package net.nanodegree.popularmovies.listeners;
  */
 public interface FragmentInteractionListener {
     public void showNoConnectivity();
-    public void showPosters(boolean reload);
+    public void showPosters();
 }

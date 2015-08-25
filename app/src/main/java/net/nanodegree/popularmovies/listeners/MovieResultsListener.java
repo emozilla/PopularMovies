@@ -8,4 +8,5 @@ import java.util.ArrayList;
  */
 public interface MovieResultsListener {
     public void onMoviesLoaded(ArrayList<Movie> movies);
+    public void onMoviesLoadError();
 }

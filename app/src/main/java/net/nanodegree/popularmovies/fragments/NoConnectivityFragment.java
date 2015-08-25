@@ -36,7 +36,7 @@ public class NoConnectivityFragment extends Fragment {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                interactionListener.showPosters(true);
+                interactionListener.showPosters();
             }
         });
 

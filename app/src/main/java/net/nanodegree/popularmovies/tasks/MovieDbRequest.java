@@ -19,7 +19,7 @@ import java.util.ArrayList;
 /**
  * Created by antonio on 13/07/15.
  */
-public class MovieDbRequest extends AsyncTask<ArrayList<String>, Void, ArrayList<Movie>> {
+public class MovieDbRequest extends AsyncTask<String, Void, ArrayList<Movie>> {
 
     private MovieResultsListener callback;
 
@@ -28,13 +28,13 @@ public class MovieDbRequest extends AsyncTask<ArrayList<String>, Void, ArrayList
     }
 
     @Override
-    protected ArrayList<Movie> doInBackground(ArrayList<String>... args) {
+    protected ArrayList<Movie> doInBackground(String... args) {
 
         ArrayList<Movie> list = null;
         HttpURLConnection connection = null;
 
         try {
-            URL url = new URL("http://api.themoviedb.org/3/discover/movie?primary_release_year=2015sort_by=popularity.asc&api_key=21a32bdbe87dae42d59a35ccf8c4cc9d");
+            URL url = new URL(args[0]);
 
             connection = (HttpURLConnection) url.openConnection();
 
@@ -45,9 +45,8 @@ public class MovieDbRequest extends AsyncTask<ArrayList<String>, Void, ArrayList
                 list = result.results;
             }
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
+            callback.onMoviesLoadError();
             e.printStackTrace();
         }
         finally {

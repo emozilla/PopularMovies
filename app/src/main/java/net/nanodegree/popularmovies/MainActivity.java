@@ -25,7 +25,7 @@ public class MainActivity extends ActionBarActivity implements FragmentInteracti
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.fragment_container, posters, "POSTERS")
+                .replace(R.id.fragment_container, posters, "POSTERS")
                 .commit();
     }
 
@@ -35,19 +35,18 @@ public class MainActivity extends ActionBarActivity implements FragmentInteracti
         if (getSupportFragmentManager().findFragmentByTag("CONNECTIVITY") == null)
             getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.fragment_container, ncFragment, "CONNECTIVITY")
+                .replace(R.id.fragment_container, ncFragment, "CONNECTIVITY")
                 .commit();
     }
 
     @Override
-    public void showPosters(boolean reload) {
+    public void showPosters() {
+
+        if (!getSupportFragmentManager().executePendingTransactions())
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .remove(ncFragment)
+                .replace(R.id.fragment_container, posters, "POSTERS")
                 .commit();
-
-        if (reload)
-            posters.doMovieSearch();
     }
 }
