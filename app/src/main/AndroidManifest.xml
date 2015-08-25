@@ -22,11 +22,7 @@
         <activity
             android:name=".MovieActivity"
             android:screenOrientation="portrait"
-            android:label="@string/title_activity_movie"
-            android:parentActivityName="net.nanodegree.popularmovies.MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="net.nanodegree.popularmovies.MainActivity" />>
+            android:label="@string/title_activity_movie">
         </activity>
     </application>
 

@@ -42,6 +42,8 @@ public class PostersFragment extends Fragment implements MovieResultsListener {
     private String apiKey = null;
     private String currentCriteria = "popularity.desc";
 
+    private boolean hasData = false;
+
     public PostersFragment() {}
 
     @Override
@@ -49,7 +51,7 @@ public class PostersFragment extends Fragment implements MovieResultsListener {
 
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState==null) {
+        if (savedInstanceState == null) {
             setHasOptionsMenu(true);
         }
     }
@@ -114,18 +116,16 @@ public class PostersFragment extends Fragment implements MovieResultsListener {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState == null) {
+            doMovieSearch();
+        }
     }
 
     public void setInteractionListener(FragmentInteractionListener interactionListener) {
         this.interactionListener = interactionListener;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        doMovieSearch();
     }
 
     public String buildQueryURL(){

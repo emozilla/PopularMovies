@@ -1,12 +1,12 @@
 package net.nanodegree.popularmovies;
 
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import net.nanodegree.popularmovies.fragments.PostersFragment;
 import net.nanodegree.popularmovies.fragments.NoConnectivityFragment;
 import net.nanodegree.popularmovies.listeners.FragmentInteractionListener;
 
-public class MainActivity extends ActionBarActivity implements FragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements FragmentInteractionListener {
 
     private PostersFragment posters;
     private NoConnectivityFragment ncFragment;
@@ -41,8 +41,6 @@ public class MainActivity extends ActionBarActivity implements FragmentInteracti
 
     @Override
     public void showPosters() {
-
-        if (!getSupportFragmentManager().executePendingTransactions())
 
         getSupportFragmentManager()
                 .beginTransaction()

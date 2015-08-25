@@ -2,6 +2,7 @@ package net.nanodegree.popularmovies;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -17,9 +18,11 @@ public class MovieActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         ImageView poster = (ImageView) findViewById(R.id.poster);
         ImageView backdrop = (ImageView) findViewById(R.id.backdrop);
         TextView plot_synopsis = (TextView) findViewById(R.id.plot_synopsis);
@@ -46,4 +49,16 @@ public class MovieActivity extends ActionBarActivity {
                     .error(R.drawable.ic_backdrop_fallback).fit().into(backdrop);
         }
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 }
