@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -40,9 +41,7 @@ public class PostersFragment extends Fragment implements MovieResultsListener {
 
     private final String BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
     private String apiKey = null;
-    private String currentCriteria = "popularity.desc";
-
-    private boolean hasData = false;
+    private String currentCriteria;
 
     public PostersFragment() {}
 
@@ -50,6 +49,9 @@ public class PostersFragment extends Fragment implements MovieResultsListener {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        currentCriteria = prefs.getString("criteria", "popularity.desc");
 
         if (savedInstanceState == null) {
             setHasOptionsMenu(true);
@@ -109,6 +111,10 @@ public class PostersFragment extends Fragment implements MovieResultsListener {
         else if (id == R.id.sort_rating) {
             currentCriteria = "vote_average.desc";
         }
+
+        SharedPreferences.Editor editor = getActivity().getPreferences(Context.MODE_PRIVATE).edit();
+        editor.putString("criteria", currentCriteria);
+        editor.apply();
 
         doMovieSearch();
 
