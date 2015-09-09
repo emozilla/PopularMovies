@@ -10,6 +10,6 @@
     <string name="title_activity_movie">MovieActivity</string>
     <string name="user_rating_text">User rating:</string>
     <string name="release_date_text">Release date:</string>
-
-
+    <string name="title_movie_list">Movies</string>
+    <string name="title_movie_detail">Movie Detail</string>
 </resources>

@@ -1,6 +1,7 @@
 package net.nanodegree.popularmovies.listeners;
 
 import net.nanodegree.popularmovies.model.Movie;
+
 import java.util.ArrayList;
 
 /**

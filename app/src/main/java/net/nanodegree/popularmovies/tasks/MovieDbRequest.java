@@ -9,12 +9,11 @@ import net.nanodegree.popularmovies.model.Movie;
 import net.nanodegree.popularmovies.model.MovieDbResult;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by antonio on 13/07/15.
@@ -23,8 +22,12 @@ public class MovieDbRequest extends AsyncTask<String, Void, ArrayList<Movie>> {
 
     private MovieResultsListener callback;
 
-    public MovieDbRequest(MovieResultsListener callback) {
+    private final String BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
+    private String apiKey = null;
+
+    public MovieDbRequest(MovieResultsListener callback, String apiKey) {
         this.callback = callback;
+        this.apiKey = apiKey;
     }
 
     @Override
@@ -34,7 +37,7 @@ public class MovieDbRequest extends AsyncTask<String, Void, ArrayList<Movie>> {
         HttpURLConnection connection = null;
 
         try {
-            URL url = new URL(args[0]);
+            URL url = new URL(buildQueryURL(args[0]));
 
             connection = (HttpURLConnection) url.openConnection();
 
@@ -61,8 +64,20 @@ public class MovieDbRequest extends AsyncTask<String, Void, ArrayList<Movie>> {
         try {
             if (callback != null)
                 callback.onMoviesLoaded(movies);
+
         }catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String buildQueryURL(String criteria){
+
+        String url = BASE_URL +
+                "primary_release_year="  + Integer.toString(Calendar.getInstance().get(Calendar.YEAR)) + "&" +
+                "language=en" + "&" +
+                "sort_by=" + criteria + "&" +
+                "api_key=" + apiKey;
+
+        return  url;
     }
 }

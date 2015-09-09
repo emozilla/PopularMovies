@@ -7,7 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+
 import com.squareup.picasso.Picasso;
+
 import net.nanodegree.popularmovies.R;
 import net.nanodegree.popularmovies.model.Movie;
 
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 public class GridPostersAdapter extends ArrayAdapter {
 
     private final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
+    private final String POSTER_RESOLUTION = "w185";
 
     private Context context;
     private int layout;
@@ -50,7 +53,7 @@ public class GridPostersAdapter extends ArrayAdapter {
         Movie movie = (Movie) data.get(position);
 
         if (movie != null)
-            Picasso.with(this.context).load(IMAGE_BASE_URL + "w185" + movie.poster)
+            Picasso.with(this.context).load(IMAGE_BASE_URL + POSTER_RESOLUTION + movie.poster)
                     .error(R.drawable.ic_poster_fallback).fit().into(holder.moviePoster);
 
         return convertView;
