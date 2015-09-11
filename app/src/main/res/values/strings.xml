@@ -12,4 +12,11 @@
     <string name="release_date_text">Release date:</string>
     <string name="title_movie_list">Movies</string>
     <string name="title_movie_detail">Movie Detail</string>
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec porttitor consectetur odio, placerat iaculis sapien semper sed. Nulla auctor sollicitudin feugiat. Mauris ut sollicitudin ipsum. Nam in laoreet sem, efficitur tincidunt tellus. Mauris vel libero risus. Suspendisse finibus ante at ante mattis mattis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec cursus ullamcorper risus. Mauris vestibulum, erat vel semper cursus, urna magna vehicula ligula, quis pulvinar massa magna lacinia tortor. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas finibus nunc non lacus egestas, porta luctus orci rutrum. Curabitur scelerisque id nibh id cursus. Suspendisse potenti. Suspendisse placerat consequat urna sit amet tempor.
+
+Ut ante tellus, dignissim nec facilisis vitae, sagittis cursus sapien. Praesent ornare id ipsum vitae egestas. Quisque aliquet dapibus dolor eu commodo. Ut ornare, dui elementum ornare posuere, ex tortor elementum nunc, ut interdum nibh enim et risus. Sed erat eros, ullamcorper ut suscipit sit amet, sagittis in purus. Aenean bibendum, lorem id dictum egestas, sem justo pretium nisl, et malesuada nibh dolor a quam. Aliquam erat volutpat. Donec metus sapien, placerat in euismod ut, volutpat sed ex. Maecenas vel pharetra mauris, et fermentum justo. Nam vitae felis sed est eleifend aliquet ac quis augue. Aenean hendrerit posuere ornare. Nam pellentesque orci ac mi ullamcorper, ac pretium felis vestibulum.
+
+Donec dapibus tincidunt sapien. Suspendisse potenti. In gravida porta elit in feugiat. Cras condimentum nibh id pharetra efficitur. Nam et lacus eu nibh egestas egestas. Vivamus sit amet dolor ligula. Mauris ut diam dapibus, varius libero at, condimentum tortor. Duis et egestas justo. Suspendisse purus mauris, interdum vel risus eu, hendrerit porttitor turpis.</string>
+
+
 </resources>

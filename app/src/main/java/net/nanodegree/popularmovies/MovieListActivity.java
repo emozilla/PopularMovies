@@ -12,12 +12,10 @@ import net.nanodegree.popularmovies.fragments.MovieGridFragment;
 import net.nanodegree.popularmovies.listeners.MovieCallbacks;
 import net.nanodegree.popularmovies.listeners.MovieResultsListener;
 import net.nanodegree.popularmovies.model.Movie;
-import net.nanodegree.popularmovies.model.ParcelableMovie;
+import net.nanodegree.popularmovies.model.parcelable.ParcelableMovie;
 import net.nanodegree.popularmovies.tasks.MovieDbRequest;
+import net.nanodegree.popularmovies.misc.Utils;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class MovieListActivity extends AppCompatActivity
@@ -105,29 +103,6 @@ public class MovieListActivity extends AppCompatActivity
         }
     }
 
-    private String getKeyFromResource() {
-
-        String strKey = "";
-
-        try {
-            InputStream in = getResources().openRawResource(R.raw.themoviedbkey);
-            BufferedReader r = new BufferedReader(new InputStreamReader(in));
-            StringBuilder total = new StringBuilder();
-
-            while ((strKey = r.readLine()) != null) {
-                total.append(strKey);
-            }
-
-            strKey = total.toString();
-            strKey = strKey.trim();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return strKey;
-    }
-
     public void onMoviesLoaded(ArrayList<Movie> movies) {
 
         ((MovieGridFragment) getSupportFragmentManager()
@@ -142,7 +117,7 @@ public class MovieListActivity extends AppCompatActivity
     public void loadMovies() {
 
         try {
-            new MovieDbRequest(this, getKeyFromResource()).execute(currentCriteria);
+            new MovieDbRequest(this, Utils.getKeyFromResource(this)).execute(currentCriteria);
         }
         catch (Exception e) {
             e.printStackTrace();

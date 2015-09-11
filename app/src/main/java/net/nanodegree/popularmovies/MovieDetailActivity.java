@@ -17,13 +17,12 @@ import net.nanodegree.popularmovies.fragments.MovieDetailFragment;
  */
 public class MovieDetailActivity extends AppCompatActivity {
 
+    private MovieDetailFragment fragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
-
-        // Show the Up button in the action bar.
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // savedInstanceState is non-null when there is fragment state
         // saved from previous configurations of this activity
@@ -39,12 +38,24 @@ public class MovieDetailActivity extends AppCompatActivity {
             // using a fragment transaction.
             Bundle arguments = new Bundle();
             arguments.putParcelable("movie", getIntent().getParcelableExtra("movie"));
-            MovieDetailFragment fragment = new MovieDetailFragment();
+            fragment = new MovieDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.movie_detail_container, fragment)
                     .commit();
         }
+        else {
+            //Restore the fragment's instance
+            fragment = (MovieDetailFragment) getSupportFragmentManager().getFragment(
+                    savedInstanceState, "movieDetail");
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //Save the fragment's instance
+        getSupportFragmentManager().putFragment(outState, "movieDetail", fragment);
     }
 
     @Override

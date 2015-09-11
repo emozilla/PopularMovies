@@ -1,7 +1,9 @@
-package net.nanodegree.popularmovies.model;
+package net.nanodegree.popularmovies.model.parcelable;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import net.nanodegree.popularmovies.model.Movie;
 
 /**
  * Created by antonio on 24/08/15.

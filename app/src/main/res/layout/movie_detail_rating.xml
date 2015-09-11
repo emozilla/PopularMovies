@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/movie_detail_vote_average"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5dp"
+        android:gravity="center_vertical"
+        android:textSize="30sp"
+        android:text="5.8"/>
+
+    <RatingBar
+        android:id="@+id/movie_detail_ratingbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="?android:attr/ratingBarStyleSmall"
+        android:clickable="false"
+        android:focusableInTouchMode="false"
+        android:focusable="false"
+        android:numStars="5"
+        android:stepSize="1.0"
+        android:rating="5.0"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/movie_detail_vote_average"
+        android:layout_toEndOf="@+id/movie_detail_vote_average" />
+
+    <TextView
+        android:id="@+id/movie_detail_vote_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:layout_below="@+id/movie_detail_ratingbar"
+        android:layout_toRightOf="@+id/movie_detail_vote_average"
+        android:layout_toEndOf="@+id/movie_detail_vote_average" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_person_white_18dp"
+        android:gravity="center_horizontal"
+        android:layout_below="@+id/movie_detail_ratingbar"
+        android:layout_toRightOf="@+id/movie_detail_vote_count"
+        android:layout_marginLeft="10dp"
+        android:layout_toEndOf="@+id/movie_detail_vote_count"/>
+
+</RelativeLayout>

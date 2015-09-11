@@ -8,12 +8,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
-        <activity
-            android:name=".MovieActivity"
-            android:label="@string/title_activity_movie"
-            android:screenOrientation="portrait" >
-        </activity>
+        android:theme="@style/AppTheme">
         <activity
             android:name=".MovieListActivity"
             android:label="@string/title_movie_list">
@@ -24,7 +19,7 @@
         </activity>
         <activity
             android:name=".MovieDetailActivity"
-            android:label="@string/title_movie_detail"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
             android:parentActivityName=".MovieListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
