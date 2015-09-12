@@ -53,11 +53,11 @@
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/movie_detail_favorite"
         app:fabSize="normal"
+        android:visibility="gone"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         app:layout_anchor="@id/movie_detail_appbar"
         app:layout_anchorGravity="bottom|right|end"
-        android:src="@drawable/ic_favorite_outline_white_18dp"
         android:layout_margin="16dp"
         android:clickable="true"/>
 

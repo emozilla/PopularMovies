@@ -25,6 +25,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.nanodegree.popularmovies.MovieListActivity" />
         </activity>
+        <provider android:name=".provider.MovieDbProvider"
+            android:authorities="net.nanodegree.popularmovies.moviedb"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

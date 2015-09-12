@@ -2,6 +2,7 @@ package net.nanodegree.popularmovies.tasks;
 
 import android.os.AsyncTask;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.nanodegree.popularmovies.listeners.MovieResultsListener;
@@ -44,6 +45,8 @@ public class MovieDbRequest extends AsyncTask<String, Void, ArrayList<Movie>> {
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 ObjectMapper mapper = new ObjectMapper();
+                /* FIX: Due to impossibility to map genre ids */
+                mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 MovieDbResult result = mapper.readValue(br, MovieDbResult.class);
                 list = result.results;
             }

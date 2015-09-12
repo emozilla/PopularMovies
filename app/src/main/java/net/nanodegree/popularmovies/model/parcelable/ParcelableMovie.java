@@ -24,7 +24,8 @@ public class ParcelableMovie extends Movie implements Parcelable {
         this.video = movie.video;
         this.vote_average = movie.vote_average;
         this.vote_count = movie.vote_count;
-        this.genre_ids = movie.genre_ids;
+        /* FIX
+        this.genre_ids = movie.genre_ids; */
     }
 
     public ParcelableMovie(Parcel in) {
@@ -61,7 +62,8 @@ public class ParcelableMovie extends Movie implements Parcelable {
 
         this.vote_average = in.readFloat();
         this.vote_count = in.readInt();
-        this.genre_ids = in.readArrayList(Integer.class.getClassLoader());
+        /* FIX
+        this.genre_ids = in.readArrayList(Integer.class.getClassLoader()); */
     }
 
     @Override
@@ -88,7 +90,8 @@ public class ParcelableMovie extends Movie implements Parcelable {
 
         out.writeFloat(this.vote_average);
         out.writeInt(this.vote_count);
-        out.writeList(this.genre_ids);
+        /* FIX
+        out.writeList(this.genre_ids); */
     }
 
     public static final Parcelable.Creator<ParcelableMovie> CREATOR

@@ -3,6 +3,7 @@
     <string name="text_sort_popularity">Most popular</string>
     <string name="text_sort_rating">Highest rated</string>
     <string name="text_sort_order">Sort order</string>
+    <string name="text_sort_favorites">Favorites</string>
     <string name="progress_title">Loading</string>
     <string name="progress_text">Loading Movies...</string>
     <string name="no_connectivity_msg">No internet connection!</string>
@@ -13,6 +14,11 @@
     <string name="title_movie_list">Movies</string>
     <string name="title_movie_detail">Movie Detail</string>
     <string name="movie_detail_share">Share</string>
+
+    <string name="movie_detail_action_favorite_add">Movie added to favorites collection.</string>
+    <string name="movie_detail_action_favorite_delete">Movie deleted from favorites collection.</string>
+
+
     <string name="watch">Watch</string>
 
 

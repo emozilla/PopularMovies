@@ -2,9 +2,16 @@ package net.nanodegree.popularmovies.fragments;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -31,12 +39,14 @@ import net.nanodegree.popularmovies.adapters.TrailersAdapter;
 import net.nanodegree.popularmovies.listeners.MovieDetailsListener;
 import net.nanodegree.popularmovies.listeners.TrailerListener;
 import net.nanodegree.popularmovies.model.Cast;
+import net.nanodegree.popularmovies.model.Movie;
 import net.nanodegree.popularmovies.model.parcelable.ParcelableCast;
 import net.nanodegree.popularmovies.model.parcelable.ParcelableMovie;
 import net.nanodegree.popularmovies.model.parcelable.ParcelableReview;
 import net.nanodegree.popularmovies.model.parcelable.ParcelableTrailer;
 import net.nanodegree.popularmovies.model.Review;
 import net.nanodegree.popularmovies.model.Trailer;
+import net.nanodegree.popularmovies.provider.MovieContract;
 import net.nanodegree.popularmovies.tasks.MovieDbCastRequest;
 import net.nanodegree.popularmovies.misc.Utils;
 import net.nanodegree.popularmovies.tasks.MovieDbReviewRequest;
@@ -46,9 +56,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class MovieDetailFragment extends Fragment implements MovieDetailsListener, TrailerListener {
+import static android.support.design.widget.CoordinatorLayout.*;
+
+public class MovieDetailFragment extends Fragment
+        implements MovieDetailsListener, TrailerListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
+
+    private boolean favorite;
 
     private ParcelableMovie movie;
     private ArrayList<Cast> castList;
@@ -85,6 +100,8 @@ public class MovieDetailFragment extends Fragment implements MovieDetailsListene
 
                 reviewRequest = new MovieDbReviewRequest(this, Utils.getKeyFromResource(getActivity()));
                 reviewRequest.execute(new Integer(movie.id));
+
+                getActivity().getSupportLoaderManager().initLoader(1, null, this);
             }
         }
     }
@@ -167,6 +184,7 @@ public class MovieDetailFragment extends Fragment implements MovieDetailsListene
         }
 
         outState.putParcelable("movie", movie);
+        outState.putBoolean("favorite", favorite);
     }
 
     private void retrieveInstanceState(Bundle savedInstanceState) {
@@ -176,6 +194,7 @@ public class MovieDetailFragment extends Fragment implements MovieDetailsListene
             return;
 
         movie = savedInstanceState.getParcelable("movie");
+        favorite = savedInstanceState.getBoolean("favorite");
 
         if (savedInstanceState.containsKey("cast")) {
 
@@ -289,6 +308,33 @@ public class MovieDetailFragment extends Fragment implements MovieDetailsListene
         getView().findViewById(R.id.movie_detail_reviews).setVisibility(View.GONE);
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+
+        String selectionClause ="_id = ?";
+        String[] selectionArgs = { movie.id.toString() };
+
+        return new CursorLoader(getActivity(), MovieContract.CONTENT_URI, null, selectionClause, selectionArgs, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+
+        FloatingActionButton fab = (FloatingActionButton) getView().findViewById(R.id.movie_detail_favorite);
+
+        if (cursor.getCount() == 0) {
+            fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_outline_white_18dp));
+            favorite = false;
+        }
+        else {
+            fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_white_18dp));
+            favorite = true;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {}
+
     private Intent getDefaultShareIntent() {
 
         Trailer trailer = new Trailer();
@@ -325,6 +371,43 @@ public class MovieDetailFragment extends Fragment implements MovieDetailsListene
         Picasso.with(getActivity()).load(IMAGE_BASE_URL + "w342" + movie.backdrop)
                 .error(R.drawable.ic_backdrop_fallback).fit()
                 .into(((ImageView) rootView.findViewById(R.id.movie_detail_backdrop)));
+
+
+        final FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.movie_detail_favorite);
+
+        if (fab.getDrawable() == null) {
+
+            if (favorite)
+                fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_white_18dp));
+            else
+                fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_outline_white_18dp));
+        }
+
+        fab.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                if (favorite) {
+
+                    String selectionClause ="_id = ?";
+                    String[] selectionArgs = { movie.id.toString() };
+                    getActivity().getContentResolver().delete(MovieContract.CONTENT_URI, selectionClause, selectionArgs);
+                    fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_outline_white_18dp));
+                    Snackbar.make(getView(), getString(R.string.movie_detail_action_favorite_delete), Snackbar.LENGTH_LONG).show();
+                    favorite = false;
+
+                } else {
+
+                    getActivity().getContentResolver().insert(MovieContract.CONTENT_URI, movie.getContentValues());
+                    fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_white_18dp));
+                    Snackbar.make(getView(), getString(R.string.movie_detail_action_favorite_add), Snackbar.LENGTH_LONG).show();
+                    favorite = true;
+                }
+            }
+        });
+
+
 
         if ((castList != null) && (castList.size() > 0)) {
             MovieCastAdapter adapter = new MovieCastAdapter(getActivity(), R.layout.cast_list_item, castList);

@@ -2,7 +2,12 @@ package net.nanodegree.popularmovies;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,13 +18,14 @@ import net.nanodegree.popularmovies.listeners.MovieCallbacks;
 import net.nanodegree.popularmovies.listeners.MovieResultsListener;
 import net.nanodegree.popularmovies.model.Movie;
 import net.nanodegree.popularmovies.model.parcelable.ParcelableMovie;
+import net.nanodegree.popularmovies.provider.MovieContract;
 import net.nanodegree.popularmovies.tasks.MovieDbRequest;
 import net.nanodegree.popularmovies.misc.Utils;
 
 import java.util.ArrayList;
 
 public class MovieListActivity extends AppCompatActivity
-        implements MovieCallbacks, MovieResultsListener {
+        implements LoaderManager.LoaderCallbacks<Cursor>, MovieCallbacks, MovieResultsListener   {
 
     private boolean mTwoPane;
 
@@ -69,6 +75,9 @@ public class MovieListActivity extends AppCompatActivity
         else if (id == R.id.sort_rating) {
             currentCriteria = "vote_average.desc";
         }
+        else if (id == R.id.sort_favorites) {
+            currentCriteria = "favorites";
+        }
 
         SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
         editor.putString("criteria", currentCriteria);
@@ -103,6 +112,32 @@ public class MovieListActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new CursorLoader(this, MovieContract.CONTENT_URI, null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+
+        ArrayList<Movie> movies = new ArrayList();
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+
+            try {
+                movies.add(Movie.fromCursor(cursor));
+            } catch (Exception e) { e.printStackTrace(); };
+
+            cursor.moveToNext();
+        }
+
+        onMoviesLoaded(movies);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {}
+
     public void onMoviesLoaded(ArrayList<Movie> movies) {
 
         ((MovieGridFragment) getSupportFragmentManager()
@@ -117,7 +152,11 @@ public class MovieListActivity extends AppCompatActivity
     public void loadMovies() {
 
         try {
-            new MovieDbRequest(this, Utils.getKeyFromResource(this)).execute(currentCriteria);
+
+            if (currentCriteria.equals("favorites"))
+                getSupportLoaderManager().initLoader(0, null, this);
+            else
+                new MovieDbRequest(this, Utils.getKeyFromResource(this)).execute(currentCriteria);
         }
         catch (Exception e) {
             e.printStackTrace();
