@@ -1,12 +1,20 @@
 package net.nanodegree.popularmovies.fragments;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,6 +29,7 @@ import net.nanodegree.popularmovies.adapters.MovieCastAdapter;
 import net.nanodegree.popularmovies.adapters.ReviewsAdapter;
 import net.nanodegree.popularmovies.adapters.TrailersAdapter;
 import net.nanodegree.popularmovies.listeners.MovieDetailsListener;
+import net.nanodegree.popularmovies.listeners.TrailerListener;
 import net.nanodegree.popularmovies.model.Cast;
 import net.nanodegree.popularmovies.model.parcelable.ParcelableCast;
 import net.nanodegree.popularmovies.model.parcelable.ParcelableMovie;
@@ -37,9 +46,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class MovieDetailFragment extends Fragment implements MovieDetailsListener {
+public class MovieDetailFragment extends Fragment implements MovieDetailsListener, TrailerListener {
 
     private final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
+
     private ParcelableMovie movie;
     private ArrayList<Cast> castList;
     private ArrayList<Trailer> trailersList;
@@ -48,6 +58,9 @@ public class MovieDetailFragment extends Fragment implements MovieDetailsListene
     private MovieDbCastRequest castRequest;
     private MovieDbTrailerRequest trailerRequest;
     private MovieDbReviewRequest reviewRequest;
+
+    private Menu mMenu;
+    private ShareActionProvider mShareActionProvider;
 
     public MovieDetailFragment() {}
 
@@ -101,11 +114,30 @@ public class MovieDetailFragment extends Fragment implements MovieDetailsListene
             retrieveInstanceState(savedInstanceState);
         }
 
+        setHasOptionsMenu(true);
+
         populate(rootView);
 
         return rootView;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        inflater.inflate(R.menu.movie_details_share, menu);
+
+        mMenu = menu;
+
+        // Set up ShareActionProvider's default share intent
+        MenuItem shareItem = menu.findItem(R.id.movie_detail_share);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+        mShareActionProvider.setShareIntent(getDefaultShareIntent());
+
+        if ((trailersList != null) && (trailersList.size() > 0)) {
+            shareItem.setVisible(true);
+        }
+
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -139,6 +171,7 @@ public class MovieDetailFragment extends Fragment implements MovieDetailsListene
 
     private void retrieveInstanceState(Bundle savedInstanceState) {
 
+        // If instance state already loaded, return
         if (movie != null)
             return;
 
@@ -193,7 +226,9 @@ public class MovieDetailFragment extends Fragment implements MovieDetailsListene
     public void onCastLoaded(ArrayList<Cast> cast) {
 
         if ((cast != null) && (cast.size() > 0)) {
+
             this.castList = cast;
+
             MovieCastAdapter adapter = new MovieCastAdapter(getActivity(), R.layout.cast_list_item, cast);
             ((ListView) getView().findViewById(R.id.movie_detail_cast)).setAdapter(adapter);
             getView().findViewById(R.id.movie_detail_cast).setVisibility(View.VISIBLE);
@@ -212,7 +247,14 @@ public class MovieDetailFragment extends Fragment implements MovieDetailsListene
 
             this.trailersList = trailers;
 
+            //Show share trailer menu
+            if (mMenu != null) {
+                mMenu.findItem(R.id.movie_detail_share).setVisible(true);
+                mShareActionProvider.setShareIntent(getDefaultShareIntent());
+            }
+
             TrailersAdapter adapter = new TrailersAdapter(trailersList, getActivity());
+            adapter.setCallback(this);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
             ((RecyclerView) getView().findViewById(R.id.movie_detail_trailers)).setHasFixedSize(false);
             ((RecyclerView) getView().findViewById(R.id.movie_detail_trailers)).setLayoutManager(mLayoutManager);
@@ -247,6 +289,19 @@ public class MovieDetailFragment extends Fragment implements MovieDetailsListene
         getView().findViewById(R.id.movie_detail_reviews).setVisibility(View.GONE);
     }
 
+    private Intent getDefaultShareIntent() {
+
+        Trailer trailer = new Trailer();
+
+        if (trailersList != null)
+            trailer = trailersList.get(0);
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, getActivity().getString(R.string.watch) + " " + movie.title + " - " +trailer.name);
+        intent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=" + trailer.key);
+        return intent;
+    }
 
     private void populate(View rootView) {
 
@@ -283,6 +338,7 @@ public class MovieDetailFragment extends Fragment implements MovieDetailsListene
         if ((trailersList != null) && (trailersList.size() > 0)) {
 
             TrailersAdapter adapter = new TrailersAdapter(trailersList, getActivity());
+            adapter.setCallback(this);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
             ((RecyclerView) rootView.findViewById(R.id.movie_detail_trailers)).setHasFixedSize(false);
             ((RecyclerView) rootView.findViewById(R.id.movie_detail_trailers)).setLayoutManager(mLayoutManager);
@@ -304,6 +360,24 @@ public class MovieDetailFragment extends Fragment implements MovieDetailsListene
         }
         else {
             rootView.findViewById(R.id.movie_detail_reviews).setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onTrailerSelected(int position) {
+        watchTrailer(trailersList.get(position).key);
+    }
+
+    private  void watchTrailer(String id) {
+
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
+            intent.putExtra("force_fullscreen",true);
+            startActivity(intent);
+        }
+        catch (ActivityNotFoundException e) {
+            Intent intent=new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v="+id));
+            startActivity(intent);
         }
     }
 }

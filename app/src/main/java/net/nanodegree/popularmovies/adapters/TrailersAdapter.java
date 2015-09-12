@@ -43,7 +43,7 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
         @Override
         public void onClick(View v) {
             if (callback != null)
-                callback.onTrailerSelected(getAdapterPosition(), v);
+                callback.onTrailerSelected(getAdapterPosition());
         }
     }
 
