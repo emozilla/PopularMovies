@@ -1,10 +1,13 @@
 package net.nanodegree.popularmovies.fragments;
 
 import android.content.ActivityNotFoundException;
+import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -32,6 +35,7 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import net.nanodegree.popularmovies.MovieDetailActivity;
 import net.nanodegree.popularmovies.R;
 import net.nanodegree.popularmovies.adapters.MovieCastAdapter;
 import net.nanodegree.popularmovies.adapters.ReviewsAdapter;
@@ -56,12 +60,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import static android.support.design.widget.CoordinatorLayout.*;
-
-public class MovieDetailFragment extends Fragment
-        implements MovieDetailsListener, TrailerListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieDetailFragment extends Fragment implements
+        MovieDetailsListener, TrailerListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
+    private static final int FAVORITE_STATUS_LOADER = 1;
+
 
     private boolean favorite;
 
@@ -101,7 +105,7 @@ public class MovieDetailFragment extends Fragment
                 reviewRequest = new MovieDbReviewRequest(this, Utils.getKeyFromResource(getActivity()));
                 reviewRequest.execute(new Integer(movie.id));
 
-                getActivity().getSupportLoaderManager().initLoader(1, null, this);
+                getActivity().getSupportLoaderManager().initLoader(FAVORITE_STATUS_LOADER, null, this);
             }
         }
     }
@@ -121,11 +125,11 @@ public class MovieDetailFragment extends Fragment
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
-        /* The best way to do this is in the activity i think*/
-        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.movie_detail_toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        /* *********************************************** */
+        if (getActivity() instanceof MovieDetailActivity) {
+            Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.movie_detail_toolbar);
+            ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         if (savedInstanceState != null) {
             retrieveInstanceState(savedInstanceState);
@@ -239,6 +243,9 @@ public class MovieDetailFragment extends Fragment
 
         if (reviewRequest != null)
             reviewRequest.cancel(true);
+
+        if (getActivity().getSupportLoaderManager().hasRunningLoaders())
+            getActivity().getLoaderManager().destroyLoader(FAVORITE_STATUS_LOADER);
     }
 
     @Override
@@ -320,16 +327,26 @@ public class MovieDetailFragment extends Fragment
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
 
-        FloatingActionButton fab = (FloatingActionButton) getView().findViewById(R.id.movie_detail_favorite);
+        switch (cursorLoader.getId()) {
 
-        if (cursor.getCount() == 0) {
-            fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_outline_white_18dp));
-            favorite = false;
+            case FAVORITE_STATUS_LOADER:
+
+                FloatingActionButton fab = (FloatingActionButton) getView().findViewById(R.id.movie_detail_favorite);
+
+                if (cursor.getCount() == 0) {
+                    fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_outline_white_18dp));
+                    favorite = false;
+                }
+                else {
+                    fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_white_18dp));
+                    favorite = true;
+                }
+
+                break;
         }
-        else {
-            fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_white_18dp));
-            favorite = true;
-        }
+
+        cursor.close();
+        getActivity().getSupportLoaderManager().destroyLoader(FAVORITE_STATUS_LOADER);
     }
 
     @Override
@@ -389,24 +406,21 @@ public class MovieDetailFragment extends Fragment
             public void onClick(View v) {
 
                 if (favorite) {
-
                     String selectionClause ="_id = ?";
                     String[] selectionArgs = { movie.id.toString() };
                     getActivity().getContentResolver().delete(MovieContract.CONTENT_URI, selectionClause, selectionArgs);
                     fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_outline_white_18dp));
-                    Snackbar.make(getView(), getString(R.string.movie_detail_action_favorite_delete), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(getActivity().findViewById(android.R.id.content), getString(R.string.movie_detail_action_favorite_delete), Snackbar.LENGTH_LONG).show();
                     favorite = false;
 
                 } else {
-
                     getActivity().getContentResolver().insert(MovieContract.CONTENT_URI, movie.getContentValues());
                     fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_white_18dp));
-                    Snackbar.make(getView(), getString(R.string.movie_detail_action_favorite_add), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(getActivity().findViewById(android.R.id.content), getString(R.string.movie_detail_action_favorite_add), Snackbar.LENGTH_LONG).show();
                     favorite = true;
                 }
             }
         });
-
 
 
         if ((castList != null) && (castList.size() > 0)) {

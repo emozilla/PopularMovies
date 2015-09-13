@@ -3,34 +3,41 @@ package net.nanodegree.popularmovies;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import net.nanodegree.popularmovies.fragments.MovieDetailFragment;
 import net.nanodegree.popularmovies.fragments.MovieGridFragment;
 import net.nanodegree.popularmovies.listeners.MovieCallbacks;
 import net.nanodegree.popularmovies.listeners.MovieResultsListener;
+import net.nanodegree.popularmovies.misc.Utils;
+import net.nanodegree.popularmovies.model.Cast;
 import net.nanodegree.popularmovies.model.Movie;
+import net.nanodegree.popularmovies.model.parcelable.ParcelableCast;
 import net.nanodegree.popularmovies.model.parcelable.ParcelableMovie;
 import net.nanodegree.popularmovies.provider.MovieContract;
 import net.nanodegree.popularmovies.tasks.MovieDbRequest;
-import net.nanodegree.popularmovies.misc.Utils;
 
 import java.util.ArrayList;
 
 public class MovieListActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Cursor>, MovieCallbacks, MovieResultsListener   {
+        implements LoaderManager.LoaderCallbacks<Cursor>, MovieCallbacks, MovieResultsListener, View.OnClickListener  {
 
     private boolean mTwoPane;
 
     private final String DEFAULT_CRITERIA = "popularity.desc";
+    private static final int FAVORITES_LOADER = 0;
+
     private String currentCriteria;
+    private ArrayList<Movie> movies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +61,37 @@ public class MovieListActivity extends AppCompatActivity
                     .setActivateOnItemClick(true);
         }
 
-        loadMovies();
+        if (savedInstanceState == null)
+            loadMovies();
+    }
 
-        // TODO: If exposing deep links into your app, handle intents here.
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        if ((movies != null) && (movies.size() > 0)) {
+            ArrayList parcelableMovies = new ArrayList<ParcelableMovie>();
+            for (Movie m : movies)
+                parcelableMovies.add(new ParcelableMovie(m));
+            savedInstanceState.putParcelableArrayList("movies", parcelableMovies);
+        }
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (savedInstanceState.containsKey("movies")) {
+
+            ArrayList<ParcelableMovie> movieBundle = savedInstanceState.getParcelableArrayList("movies");
+
+            movies = new ArrayList<Movie>();
+
+            for (Movie m : movieBundle)
+                movies.add(m);
+
+            onMoviesLoaded(movies);
+        }
     }
 
     @Override
@@ -120,19 +155,27 @@ public class MovieListActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
 
-        ArrayList<Movie> movies = new ArrayList();
+        switch (cursorLoader.getId()) {
 
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
+            case FAVORITES_LOADER:
 
-            try {
-                movies.add(Movie.fromCursor(cursor));
-            } catch (Exception e) { e.printStackTrace(); };
+                ArrayList<Movie> movies = new ArrayList();
 
-            cursor.moveToNext();
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast()) {
+
+                    try {
+                        movies.add(Movie.fromCursor(cursor));
+                    } catch (Exception e) { e.printStackTrace(); };
+
+                    cursor.moveToNext();
+                }
+
+                if (currentCriteria.equals("favorites"))
+                    onMoviesLoaded(movies);
+
+            break;
         }
-
-        onMoviesLoaded(movies);
     }
 
     @Override
@@ -140,23 +183,38 @@ public class MovieListActivity extends AppCompatActivity
 
     public void onMoviesLoaded(ArrayList<Movie> movies) {
 
+        this.movies = movies;
+
         ((MovieGridFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.movie_list))
                 .setMovies(movies);
     }
 
     public void onMoviesLoadError() {
-        //TODO: Handle error cases here
+
+        Snackbar.make(findViewById(android.R.id.content), getString(R.string.no_connectivity), Snackbar.LENGTH_INDEFINITE)
+                .setAction(getString(R.string.retry), this)
+                .setActionTextColor(Color.RED)
+                .show();
+
     }
+
+    @Override
+    public void onClick(View view) {
+        loadMovies();
+    }
+
 
     public void loadMovies() {
 
         try {
 
-            if (currentCriteria.equals("favorites"))
-                getSupportLoaderManager().initLoader(0, null, this);
-            else
+            if (currentCriteria.equals("favorites")) {
+                getSupportLoaderManager().initLoader(FAVORITES_LOADER, null, this);
+           }
+            else {
                 new MovieDbRequest(this, Utils.getKeyFromResource(this)).execute(currentCriteria);
+            }
         }
         catch (Exception e) {
             e.printStackTrace();

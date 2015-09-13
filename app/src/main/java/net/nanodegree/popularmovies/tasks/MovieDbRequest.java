@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.nanodegree.popularmovies.listeners.MovieResultsListener;
+import net.nanodegree.popularmovies.misc.Utils;
 import net.nanodegree.popularmovies.model.Movie;
 import net.nanodegree.popularmovies.model.MovieDbResult;
 

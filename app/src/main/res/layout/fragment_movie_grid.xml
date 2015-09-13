@@ -4,7 +4,8 @@
     android:layout_height="match_parent" tools:context="net.nanodegree.popularmovies.fragments.MovieGridFragment">
 
     <GridView android:id="@android:id/list" android:layout_width="match_parent"
-        android:layout_height="match_parent" android:numColumns="2" />
+        android:layout_height="match_parent" android:numColumns="auto_fit"
+        android:columnWidth="250dp" android:stretchMode="columnWidth" android:gravity="center"/>
 
     <TextView android:id="@android:id/empty" android:layout_width="match_parent"
         android:layout_height="match_parent" android:gravity="center" android:text="EMPTY" />

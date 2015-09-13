@@ -102,7 +102,10 @@ public class GridFragment extends Fragment {
         GridView gv = new GridView(getActivity());
         gv.setId(android.R.id.list);
         gv.setDrawSelectorOnTop(false);
-        gv.setNumColumns(2);
+        //FIXME
+        gv.setNumColumns(GridView.AUTO_FIT);
+        gv.setColumnWidth(250);
+        gv.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
         lframe.addView(gv, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 

@@ -136,6 +136,8 @@ public class MovieGridFragment extends GridFragment {
     }
 
     public void setMovies(ArrayList<Movie> movies) {
-        setListAdapter(new GridPostersAdapter(getActivity(), R.layout.movie_grid_item, movies));
+
+        if (movies != null)
+            setListAdapter(new GridPostersAdapter(getActivity(), R.layout.movie_grid_item, movies));
     }
 }
