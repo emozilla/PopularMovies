@@ -41,7 +41,7 @@ public class MovieGridFragment extends GridFragment {
     /**
      * The current activated item position. Only used on tablets.
      */
-    private int mActivatedPosition = ListView.INVALID_POSITION;
+    private int mActivatedPosition = GridView.INVALID_POSITION;
 
 
     /**
@@ -106,7 +106,7 @@ public class MovieGridFragment extends GridFragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mActivatedPosition != ListView.INVALID_POSITION) {
+        if (mActivatedPosition != GridView.INVALID_POSITION) {
             // Serialize and persist the activated item position.
             outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
         }
@@ -117,7 +117,7 @@ public class MovieGridFragment extends GridFragment {
      * given the 'activated' state when touched.
      */
     public void setActivateOnItemClick(boolean activateOnItemClick) {
-        // When setting CHOICE_MODE_SINGLE, ListView will automatically
+        // When setting CHOICE_MODE_SINGLE, GridView will automatically
         // give items the 'activated' state when touched.
         getGridView().setChoiceMode(activateOnItemClick
                 ? GridView.CHOICE_MODE_SINGLE
@@ -126,7 +126,7 @@ public class MovieGridFragment extends GridFragment {
 
     private void setActivatedPosition(int position) {
 
-        if (position == ListView.INVALID_POSITION) {
+        if (position == GridView.INVALID_POSITION) {
             getGridView().setItemChecked(mActivatedPosition, false);
         } else {
             getGridView().setItemChecked(position, true);

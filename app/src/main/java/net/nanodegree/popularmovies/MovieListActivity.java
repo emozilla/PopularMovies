@@ -47,6 +47,16 @@ public class MovieListActivity extends AppCompatActivity
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         currentCriteria = prefs.getString("criteria", DEFAULT_CRITERIA);
 
+        if (currentCriteria.equals("popularity.desc")){
+            getSupportActionBar().setTitle(getString(R.string.movies) + " : " + getString(R.string.text_sort_popularity));
+        }
+        else if (currentCriteria.equals("vote_average.desc")) {
+            getSupportActionBar().setTitle(getString(R.string.movies) + " : " + getString(R.string.text_sort_rating));
+        }
+        else if (currentCriteria.equals("favorites")) {
+            getSupportActionBar().setTitle(getString(R.string.movies) + " : " + getString(R.string.text_sort_favorites));
+        }
+
         if (findViewById(R.id.movie_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-large and
@@ -102,6 +112,7 @@ public class MovieListActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         int id = item.getItemId();
 
         if (id == R.id.sort_popular) {
@@ -117,6 +128,8 @@ public class MovieListActivity extends AppCompatActivity
         SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
         editor.putString("criteria", currentCriteria);
         editor.apply();
+
+        getSupportActionBar().setTitle(getString(R.string.movies) + " : " + item.getTitle());
 
         loadMovies();
 

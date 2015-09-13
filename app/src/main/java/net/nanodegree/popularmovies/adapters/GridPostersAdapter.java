@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -43,7 +44,9 @@ public class GridPostersAdapter extends ArrayAdapter {
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
             convertView = inflater.inflate(layout, parent, false);
             holder = new MovieHolder();
-            holder.moviePoster = (ImageView)convertView.findViewById(R.id.poster);
+            holder.moviePoster = (ImageView)convertView.findViewById(R.id.movie_poster);
+            holder.movieTitle = (TextView)convertView.findViewById(R.id.movie_title);
+
             convertView.setTag(holder);
         }
         else {
@@ -56,11 +59,14 @@ public class GridPostersAdapter extends ArrayAdapter {
             Picasso.with(this.context).load(IMAGE_BASE_URL + POSTER_RESOLUTION + movie.poster)
                     .error(R.drawable.ic_poster_fallback).fit().into(holder.moviePoster);
 
+        holder.movieTitle.setText(movie.title);
+
         return convertView;
     }
 
     static class MovieHolder
     {
         ImageView moviePoster;
+        TextView  movieTitle;
     }
 }

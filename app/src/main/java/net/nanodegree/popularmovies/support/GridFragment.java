@@ -18,6 +18,13 @@ import android.widget.ListAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import net.nanodegree.popularmovies.R;
+import net.nanodegree.popularmovies.misc.Utils;
+
+/*
+ * Clone of ListFragment of Android but using GridView
+ */
+
 public class GridFragment extends Fragment {
     
     static final int INTERNAL_EMPTY_ID              = 0x00ff0001;
@@ -96,16 +103,17 @@ public class GridFragment extends Fragment {
         TextView tv = new TextView(getActivity());
         tv.setId(INTERNAL_EMPTY_ID);
         tv.setGravity(Gravity.CENTER);
+        tv.setText(getString(R.string.movie_grid_no_movies));
         lframe.addView(tv, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 
         GridView gv = new GridView(getActivity());
         gv.setId(android.R.id.list);
         gv.setDrawSelectorOnTop(false);
-        //FIXME
         gv.setNumColumns(GridView.AUTO_FIT);
-        gv.setColumnWidth(250);
+        gv.setColumnWidth(Utils.convertDpToPixels(149, getActivity()));
         gv.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
+        gv.setGravity(Gravity.CENTER);
         lframe.addView(gv, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 

@@ -1,14 +1,11 @@
 package net.nanodegree.popularmovies.fragments;
 
 import android.content.ActivityNotFoundException;
-import android.content.ContentProviderClient;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.RemoteException;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -28,31 +25,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import net.nanodegree.popularmovies.MovieDetailActivity;
 import net.nanodegree.popularmovies.R;
 import net.nanodegree.popularmovies.adapters.MovieCastAdapter;
-import net.nanodegree.popularmovies.adapters.ReviewsAdapter;
 import net.nanodegree.popularmovies.adapters.TrailersAdapter;
 import net.nanodegree.popularmovies.listeners.MovieDetailsListener;
 import net.nanodegree.popularmovies.listeners.TrailerListener;
+import net.nanodegree.popularmovies.misc.Utils;
 import net.nanodegree.popularmovies.model.Cast;
-import net.nanodegree.popularmovies.model.Movie;
+import net.nanodegree.popularmovies.model.Review;
+import net.nanodegree.popularmovies.model.Trailer;
 import net.nanodegree.popularmovies.model.parcelable.ParcelableCast;
 import net.nanodegree.popularmovies.model.parcelable.ParcelableMovie;
 import net.nanodegree.popularmovies.model.parcelable.ParcelableReview;
 import net.nanodegree.popularmovies.model.parcelable.ParcelableTrailer;
-import net.nanodegree.popularmovies.model.Review;
-import net.nanodegree.popularmovies.model.Trailer;
 import net.nanodegree.popularmovies.provider.MovieContract;
 import net.nanodegree.popularmovies.tasks.MovieDbCastRequest;
-import net.nanodegree.popularmovies.misc.Utils;
 import net.nanodegree.popularmovies.tasks.MovieDbReviewRequest;
 import net.nanodegree.popularmovies.tasks.MovieDbTrailerRequest;
 
@@ -125,11 +119,20 @@ public class MovieDetailFragment extends Fragment implements
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
+        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.movie_detail_toolbar);
+
         if (getActivity() instanceof MovieDetailActivity) {
-            Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.movie_detail_toolbar);
             ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
             ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+        else {
+
+            if (movie != null) {
+                toolbar.setTitle(movie.title);
+                toolbar.setTitleTextColor(Color.WHITE);
+            }
+        }
+
 
         if (savedInstanceState != null) {
             retrieveInstanceState(savedInstanceState);
@@ -255,16 +258,17 @@ public class MovieDetailFragment extends Fragment implements
 
             this.castList = cast;
 
-            MovieCastAdapter adapter = new MovieCastAdapter(getActivity(), R.layout.cast_list_item, cast);
-            ((ListView) getView().findViewById(R.id.movie_detail_cast)).setAdapter(adapter);
-            getView().findViewById(R.id.movie_detail_cast).setVisibility(View.VISIBLE);
+            MovieCastAdapter adapter = new MovieCastAdapter(castList, getActivity());
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+            ((RecyclerView) getView().findViewById(R.id.movie_detail_cast)).setHasFixedSize(false);
+            ((RecyclerView) getView().findViewById(R.id.movie_detail_cast)).setLayoutManager(mLayoutManager);
+            ((RecyclerView) getView().findViewById(R.id.movie_detail_cast)).setAdapter(adapter);
+            getView().findViewById(R.id.movie_detail_cast_container).setVisibility(View.VISIBLE);
         }
     }
 
     @Override
-    public void onCastLoadError() {
-        getView().findViewById(R.id.movie_detail_cast).setVisibility(View.GONE);
-    }
+    public void onCastLoadError() {}
 
     @Override
     public void onTrailersLoaded(ArrayList<Trailer> trailers) {
@@ -281,18 +285,16 @@ public class MovieDetailFragment extends Fragment implements
 
             TrailersAdapter adapter = new TrailersAdapter(trailersList, getActivity());
             adapter.setCallback(this);
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
             ((RecyclerView) getView().findViewById(R.id.movie_detail_trailers)).setHasFixedSize(false);
             ((RecyclerView) getView().findViewById(R.id.movie_detail_trailers)).setLayoutManager(mLayoutManager);
             ((RecyclerView) getView().findViewById(R.id.movie_detail_trailers)).setAdapter(adapter);
-            getView().findViewById(R.id.movie_detail_trailers).setVisibility(View.VISIBLE);
+            getView().findViewById(R.id.movie_detail_trailers_container).setVisibility(View.VISIBLE);
         }
     }
 
     @Override
-    public void onTrailersLoadError() {
-        getView().findViewById(R.id.movie_detail_trailers).setVisibility(View.GONE);
-    }
+    public void onTrailersLoadError() {}
 
     @Override
     public void onReviewsLoaded(ArrayList<Review> reviews) {
@@ -301,19 +303,26 @@ public class MovieDetailFragment extends Fragment implements
 
             this.reviewsList = reviews;
 
-            ReviewsAdapter adapter = new ReviewsAdapter(reviewsList);
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-            ((RecyclerView) getView().findViewById(R.id.movie_detail_reviews)).setHasFixedSize(false);
-            ((RecyclerView) getView().findViewById(R.id.movie_detail_reviews)).setLayoutManager(mLayoutManager);
-            ((RecyclerView) getView().findViewById(R.id.movie_detail_reviews)).setAdapter(adapter);
-            getView().findViewById(R.id.movie_detail_reviews).setVisibility(View.VISIBLE);
+            LinearLayout reviewsContainer = (LinearLayout) getView().findViewById(R.id.movie_detail_reviews_container);
+
+            final int count = reviewsList.size();
+
+            for (int i = 0; i < count; i++) {
+
+                Review review = reviewsList.get(i);
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                View v = inflater.inflate(R.layout.review_item, null, false);
+                ((TextView)v.findViewById(R.id.review_author)).setText(review.author);
+                ((TextView)v.findViewById(R.id.review_content)).setText(review.content);
+                reviewsContainer.addView(v);
+            }
+
+            reviewsContainer.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
-    public void onReviewsLoadError() {
-        getView().findViewById(R.id.movie_detail_reviews).setVisibility(View.GONE);
-    }
+    public void onReviewsLoadError() {}
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
@@ -333,13 +342,15 @@ public class MovieDetailFragment extends Fragment implements
 
                 FloatingActionButton fab = (FloatingActionButton) getView().findViewById(R.id.movie_detail_favorite);
 
-                if (cursor.getCount() == 0) {
-                    fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_outline_white_18dp));
-                    favorite = false;
-                }
-                else {
-                    fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_white_18dp));
-                    favorite = true;
+                if (fab != null) {
+
+                    if (cursor.getCount() == 0) {
+                        fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_outline_white_18dp));
+                        favorite = false;
+                    } else {
+                        fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_white_18dp));
+                        favorite = true;
+                    }
                 }
 
                 break;
@@ -368,16 +379,18 @@ public class MovieDetailFragment extends Fragment implements
 
     private void populate(View rootView) {
 
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(movie.title);
+        if (getActivity() instanceof MovieDetailActivity) {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(movie.title);
+        }
 
         ((TextView) rootView.findViewById(R.id.movie_detail_overview)).setText(movie.overview);
 
         ((RatingBar) rootView.findViewById(R.id.movie_detail_ratingbar))
                 .setRating(movie.vote_average / 2);
         ((TextView) rootView.findViewById(R.id.movie_detail_vote_average))
-                .setText(Float.toString(movie.vote_average / 2));
+                .setText(Float.toString(movie.vote_average));
         ((TextView) rootView.findViewById(R.id.movie_detail_vote_count))
-                .setText(Integer.toString(movie.vote_count));
+                .setText(Integer.toString(movie.vote_count) + " " + getString(R.string.votes));
         ((TextView) rootView.findViewById(R.id.movie_detail_release_date))
                 .setText(new SimpleDateFormat("MMMM yyyy", Locale.US).format(movie.release));
 
@@ -406,8 +419,8 @@ public class MovieDetailFragment extends Fragment implements
             public void onClick(View v) {
 
                 if (favorite) {
-                    String selectionClause ="_id = ?";
-                    String[] selectionArgs = { movie.id.toString() };
+                    String selectionClause = "_id = ?";
+                    String[] selectionArgs = {movie.id.toString()};
                     getActivity().getContentResolver().delete(MovieContract.CONTENT_URI, selectionClause, selectionArgs);
                     fab.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.ic_favorite_outline_white_18dp));
                     Snackbar.make(getActivity().findViewById(android.R.id.content), getString(R.string.movie_detail_action_favorite_delete), Snackbar.LENGTH_LONG).show();
@@ -422,41 +435,44 @@ public class MovieDetailFragment extends Fragment implements
             }
         });
 
-
         if ((castList != null) && (castList.size() > 0)) {
-            MovieCastAdapter adapter = new MovieCastAdapter(getActivity(), R.layout.cast_list_item, castList);
-            ((ListView) rootView.findViewById(R.id.movie_detail_cast)).setAdapter(adapter);
-            rootView.findViewById(R.id.movie_detail_cast).setVisibility(View.VISIBLE);
-        }
-        else {
-            rootView.findViewById(R.id.movie_detail_cast).setVisibility(View.GONE);
+
+            MovieCastAdapter adapter = new MovieCastAdapter(castList, getActivity());
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+            ((RecyclerView) rootView.findViewById(R.id.movie_detail_cast)).setHasFixedSize(false);
+            ((RecyclerView) rootView.findViewById(R.id.movie_detail_cast)).setLayoutManager(mLayoutManager);
+            ((RecyclerView) rootView.findViewById(R.id.movie_detail_cast)).setAdapter(adapter);
+            rootView.findViewById(R.id.movie_detail_cast_container).setVisibility(View.VISIBLE);
         }
 
         if ((trailersList != null) && (trailersList.size() > 0)) {
 
             TrailersAdapter adapter = new TrailersAdapter(trailersList, getActivity());
             adapter.setCallback(this);
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
             ((RecyclerView) rootView.findViewById(R.id.movie_detail_trailers)).setHasFixedSize(false);
             ((RecyclerView) rootView.findViewById(R.id.movie_detail_trailers)).setLayoutManager(mLayoutManager);
             ((RecyclerView) rootView.findViewById(R.id.movie_detail_trailers)).setAdapter(adapter);
-            rootView.findViewById(R.id.movie_detail_trailers).setVisibility(View.VISIBLE);
-        }
-        else {
-            rootView.findViewById(R.id.movie_detail_trailers).setVisibility(View.GONE);
+            rootView.findViewById(R.id.movie_detail_trailers_container).setVisibility(View.VISIBLE);
         }
 
         if ((reviewsList != null) && (reviewsList.size() > 0)) {
 
-            ReviewsAdapter adapter = new ReviewsAdapter(reviewsList);
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-            ((RecyclerView) rootView.findViewById(R.id.movie_detail_reviews)).setHasFixedSize(false);
-            ((RecyclerView) rootView.findViewById(R.id.movie_detail_reviews)).setLayoutManager(mLayoutManager);
-            ((RecyclerView) rootView.findViewById(R.id.movie_detail_reviews)).setAdapter(adapter);
-            rootView.findViewById(R.id.movie_detail_reviews).setVisibility(View.VISIBLE);
-        }
-        else {
-            rootView.findViewById(R.id.movie_detail_reviews).setVisibility(View.GONE);
+            LinearLayout reviewsContainer = (LinearLayout) rootView.findViewById(R.id.movie_detail_reviews_container);
+
+            final int count = reviewsList.size();
+
+            for (int i = 0; i < count; i++) {
+
+                Review review = reviewsList.get(i);
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                View v = inflater.inflate(R.layout.review_item, null, false);
+                ((TextView)v.findViewById(R.id.review_author)).setText(review.author);
+                ((TextView)v.findViewById(R.id.review_content)).setText(review.content);
+                reviewsContainer.addView(v);
+            }
+
+            reviewsContainer.setVisibility(View.VISIBLE);
         }
     }
 

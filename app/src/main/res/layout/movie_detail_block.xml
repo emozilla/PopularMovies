@@ -1,112 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/movie_detail_poster"
-        android:layout_margin="16dp"
-        android:layout_width="150dp"
-        android:layout_height="221dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:src="@drawable/ic_poster_fallback"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/movie_detail_poster"
+            android:layout_margin="16dp"
+            android:layout_width="150dp"
+            android:layout_height="221dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="120dp"
+            android:scaleType="centerCrop"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:adjustViewBounds="true"
+            android:background="@drawable/drop_shadow"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="16dp"
+            android:gravity="start|bottom">
+
+            <TextView
+                android:id="@+id/movie_detail_release_date"
+                android:gravity="right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"/>
+
+            <include layout="@layout/movie_detail_rating"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@id/movie_detail_poster"
-        android:gravity="start">
+        android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/movie_detail_release_date"
-            android:gravity="right"
-            android:layout_width="wrap_content"
+            android:id="@+id/movie_detail_overview"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:layout_marginBottom="16dp"
-            android:text="May 2015"/>
-
-        <include layout="@layout/movie_detail_rating"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:layout_gravity="center_vertical|left"/>
 
     </LinearLayout>
 
-    <!--<com.ms.square.android.expandabletextview.ExpandableTextView
-        android:id="@+id/movie_detail_overview"
+    <LinearLayout
+        android:id="@+id/movie_detail_cast_container"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/movie_detail_poster"
-        app:maxCollapsedLines="3"
-        app:animDuration="200">
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:visibility="gone">
 
         <TextView
-            android:id="@id/expandable_text"
+            style="?android:attr/listSeparatorTextViewStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:gravity="center_horizontal"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:text="@string/movie_detail_text_cast"/>
 
-        <ImageButton
-            android:id="@id/expand_collapse"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:layout_gravity="right|bottom"
-            android:background="@android:color/transparent"/>
-    </com.ms.square.android.expandabletextview.ExpandableTextView> -->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/movie_detail_cast"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:gravity="center"
+            android:scrollbars="horizontal"/>
 
-    <TextView
-        android:id="@+id/movie_detail_overview"
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/movie_detail_trailers_container"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_below="@id/movie_detail_poster"
-        android:gravity="center_horizontal"/>
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:visibility="gone">
 
+        <TextView
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:text="@string/movie_detail_text_trailers"/>
 
-    <View style="@style/Divider"
-        android:id="@+id/movie_detail_sp1"
-        android:layout_gravity="center"
-        android:layout_margin="16dp"
-        android:layout_below="@id/movie_detail_overview"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/movie_detail_trailers"
+            android:layout_width="match_parent"
+            android:layout_height="164dp"
+            android:gravity="center"
+            android:scrollbars="horizontal"/>
 
-    <ListView
-        android:id="@+id/movie_detail_cast"
-        android:layout_below="@id/movie_detail_sp1"
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/movie_detail_reviews_container"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="65dp" />
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone">
 
-    <View style="@style/Divider"
-        android:id="@+id/movie_detail_sp2"
-        android:layout_gravity="center"
-        android:layout_margin="16dp"
-        android:layout_below="@id/movie_detail_cast"/>
+        <TextView
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:text="@string/movie_detail_text_reviews"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/movie_detail_trailers"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_below="@id/movie_detail_sp2"
-        android:scrollbars="vertical"/>
+    </LinearLayout>
 
-    <View style="@style/Divider"
-        android:id="@+id/movie_detail_sp3"
-        android:layout_gravity="center"
-        android:layout_margin="16dp"
-        android:layout_below="@id/movie_detail_trailers"/>
+</LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/movie_detail_reviews"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_below="@id/movie_detail_sp3"
-        android:scrollbars="vertical"/>
-
-</RelativeLayout>

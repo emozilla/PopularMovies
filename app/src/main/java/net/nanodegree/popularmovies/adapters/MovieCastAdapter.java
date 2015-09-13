@@ -1,11 +1,10 @@
 package net.nanodegree.popularmovies.adapters;
 
-import android.app.Activity;
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,67 +12,63 @@ import com.squareup.picasso.Picasso;
 
 import net.nanodegree.popularmovies.R;
 import net.nanodegree.popularmovies.model.Cast;
-import net.nanodegree.popularmovies.model.Movie;
+import net.nanodegree.popularmovies.model.Review;
+import net.nanodegree.popularmovies.model.Trailer;
 
 import java.util.ArrayList;
 
 /**
- * Created by antonio on 10/09/15.
+ * Created by antonio on 11/09/15.
  */
-public class MovieCastAdapter extends ArrayAdapter {
+public class MovieCastAdapter extends RecyclerView.Adapter<MovieCastAdapter.CastHolder> {
 
     private final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
-    private final String PROFILE_RESOLUTION = "w45";
+    private final String PROFILE_RESOLUTION = "w92";
 
+    private ArrayList<Cast> cast;
     private Context context;
-    private int layout;
-    private ArrayList data;
 
-    public MovieCastAdapter(Context context, int layout, ArrayList data) {
-        super(context, layout, data);
-        this.layout = layout;
+    public static class CastHolder extends RecyclerView.ViewHolder {
+
+        ImageView image;
+        TextView name;
+
+        public CastHolder(View itemView) {
+            super(itemView);
+
+            image = (ImageView) itemView.findViewById(R.id.cast_image);
+            name = (TextView) itemView.findViewById(R.id.cast_name);
+        }
+    }
+
+    public MovieCastAdapter(ArrayList<Cast> list, Context context) {
         this.context = context;
-        this.data = data;
+        this.cast = list;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public CastHolder onCreateViewHolder(ViewGroup parent,
+                                           int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.cast_item, parent, false);
 
-        CastHolder holder = null;
-
-        if (convertView == null) {
-            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-            convertView = inflater.inflate(layout, parent, false);
-            holder = new CastHolder();
-            holder.profileImage = (ImageView)convertView.findViewById(R.id.cast_image);
-           // holder.name = (TextView)convertView.findViewById(R.id.cast_name);
-           // holder.character = (TextView)convertView.findViewById(R.id.cast_character);
-
-            convertView.setTag(holder);
-        }
-        else {
-            holder = (CastHolder) convertView.getTag();
-        }
-
-        Cast cast = (Cast) data.get(position);
-
-        if (cast != null) {
-
-            Picasso.with(this.context).load(IMAGE_BASE_URL + PROFILE_RESOLUTION + cast.profileImage)
-                    .error(R.drawable.ic_profile_fallback).fit().into(holder.profileImage);
-
-         //   holder.name.setText(cast.name);
-         //   holder.character.setText(cast.character);
-
-        }
-
-        return convertView;
+        return new CastHolder(view);
     }
 
-    static class CastHolder
-    {
-        ImageView profileImage;
-       // TextView name;
-       // TextView character;
+    @Override
+    public void onBindViewHolder(CastHolder holder, int position) {
+
+        Cast c = cast.get(position);
+
+        Picasso.with(this.context).load(IMAGE_BASE_URL + PROFILE_RESOLUTION + c.profileImage)
+                .error(R.drawable.ic_profile_fallback).fit().into(holder.image);
+
+
+        holder.name.setText(c.name);
+    }
+
+    @Override
+    public int getItemCount() {
+        return cast.size();
     }
 }

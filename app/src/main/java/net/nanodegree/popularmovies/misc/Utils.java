@@ -1,12 +1,16 @@
 package net.nanodegree.popularmovies.misc;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.util.TypedValue;
 
 import net.nanodegree.popularmovies.R;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import static android.util.TypedValue.*;
 
 /**
  * Created by antonio on 10/09/15.
@@ -36,13 +40,13 @@ public class Utils {
         return strKey;
      }
 
-
-    public static void log(String message) {
-
-        System.out.println("************************************************************************");
-        System.out.println("*                                                                      *");
-        System.out.println(message);
-        System.out.println("*                                                                      *");
-        System.out.println("************************************************************************");
+    // from http://stackoverflow.com/questions/13974289/how-to-set-height-of-gridview-programmatically-android
+    public static int convertDpToPixels(float dp, Context context){
+        Resources resources = context.getResources();
+        return (int) applyDimension(
+                COMPLEX_UNIT_DIP,
+                dp,
+                resources.getDisplayMetrics()
+        );
     }
 }

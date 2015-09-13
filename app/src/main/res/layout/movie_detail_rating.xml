@@ -9,8 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="5dp"
         android:gravity="center_vertical"
-        android:textSize="30sp"
-        android:text="5.8"/>
+        android:textSize="30sp"/>
 
     <RatingBar
         android:id="@+id/movie_detail_ratingbar"
@@ -22,7 +21,7 @@
         android:focusable="false"
         android:numStars="5"
         android:stepSize="1.0"
-        android:rating="5.0"
+        android:rating="0"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/movie_detail_vote_average"
         android:layout_toEndOf="@+id/movie_detail_vote_average" />
@@ -31,19 +30,8 @@
         android:id="@+id/movie_detail_vote_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0"
         android:layout_below="@+id/movie_detail_ratingbar"
         android:layout_toRightOf="@+id/movie_detail_vote_average"
         android:layout_toEndOf="@+id/movie_detail_vote_average" />
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_person_white_18dp"
-        android:gravity="center_horizontal"
-        android:layout_below="@+id/movie_detail_ratingbar"
-        android:layout_toRightOf="@+id/movie_detail_vote_count"
-        android:layout_marginLeft="10dp"
-        android:layout_toEndOf="@+id/movie_detail_vote_count"/>
 
 </RelativeLayout>

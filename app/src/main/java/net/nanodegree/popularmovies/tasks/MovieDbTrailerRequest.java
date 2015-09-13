@@ -74,9 +74,6 @@ public class MovieDbTrailerRequest extends AsyncTask<Integer, Void, ArrayList<Tr
                 movieId.toString() +
                 "/videos?" +
                 "api_key=" + apiKey;
-
-        System.out.println(url);
-
         return  url;
     }
 

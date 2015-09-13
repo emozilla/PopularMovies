@@ -14,13 +14,13 @@
     <string name="title_movie_list">Movies</string>
     <string name="title_movie_detail">Movie Detail</string>
     <string name="movie_detail_share">Share</string>
-
     <string name="movie_detail_action_favorite_add">Movie added to favorites collection.</string>
     <string name="movie_detail_action_favorite_delete">Movie deleted from favorites collection.</string>
-
-
+    <string name="movies">Movies</string>
     <string name="watch">Watch</string>
-
-
-
+    <string name="votes">Votes</string>
+    <string name="movie_grid_no_movies">No movies loaded</string>
+    <string name="movie_detail_text_cast">Cast</string>
+    <string name="movie_detail_text_trailers">Trailers</string>
+    <string name="movie_detail_text_reviews">Reviews</string>
 </resources>
